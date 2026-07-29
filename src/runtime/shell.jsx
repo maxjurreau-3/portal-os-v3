@@ -5,7 +5,6 @@ import { DiagnosticsPanel } from "./diagnostics.jsx";
 import { Notifications } from "./notifications.jsx";
 import { CommandPalette } from "./command-palette.jsx";
 
-
 export function PortalShell() {
   // Initialize unified runtime surface
   const surface = UnifiedSurface();
@@ -24,6 +23,15 @@ export function PortalShell() {
     <div style={styles.shell}>
       {/* ⭐ Global OS Notifications */}
       <Notifications />
+
+      {/* ⭐ Global Command Palette */}
+      <CommandPalette
+        onCommand={({ type, name }) => {
+          if (type === "switch-module") {
+            setActiveModule(name);
+          }
+        }}
+      />
 
       {/* Left navigation rail */}
       <div style={styles.nav}>
