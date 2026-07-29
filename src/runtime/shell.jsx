@@ -5,6 +5,7 @@ import { DiagnosticsPanel } from "./diagnostics.jsx";
 import { Notifications } from "./notifications.jsx";
 import { CommandPalette } from "./command-palette.jsx";
 import { ThemeEngine } from "./theme-engine.js";
+import { WindowManager } from "./window-manager.jsx";
 
 export function PortalShell() {
   const surface = UnifiedSurface();
@@ -26,41 +27,68 @@ export function PortalShell() {
     <div style={styles.shell}>
       <Notifications />
 
-      <CommandPalette
-        onCommand={({ type, name }) => {
-          if (type === "switch-module") {
-            setActiveModule(name);
-          }
-        }}
-      />
-
-      <div style={styles.nav}>
-        <h3 style={styles.navTitle}>Portal‑OS‑v3</h3>
-
-        <ul style={styles.navList}>
-          {moduleNames.map(name => (
-            <li
-              key={name}
-              style={{
-                ...styles.navItem,
-                ...(activeModule === name ? styles.navItemActive : {})
+      <WindowManager>
+        {({ openWindow }) => (
+          <>
+            <CommandPalette
+              onCommand={({ type, name }) => {
+                if (type === "switch-module") {
+                  setActiveModule(name);
+                }
+                if (type === "open-window") {
+                  openWindow("New Window", <div>Hello from Portal‑OS‑v3</div>);
+                }
               }}
-              onClick={() => setActiveModule(name)}
-            >
-              {name}
-            </li>
-          ))}
-        </ul>
-      </div>
+            />
 
-      <div style={styles.surface}>
-        <h2 style={styles.surfaceTitle}>{module?.title}</h2>
-        <p style={styles.surfaceDesc}>{module?.description}</p>
-        <div style={styles.surfaceContent}>{module?.content}</div>
+            <div style={styles.nav}>
+              <h3 style={styles.navTitle}>Portal‑OS‑v3</h3>
 
-        <OperatorConsole />
-        <DiagnosticsPanel />
-      </div>
+              <ul style={styles.navList}>
+                {moduleNames.map(name => (
+                  <li
+                    key={name}
+                    style={{
+                      ...styles.navItem,
+                      ...(activeModule === name ? styles.navItemActive : {})
+                    }}
+                    onClick={() => setActiveModule(name)}
+                  >
+                    {name}
+                  </li>
+                ))}
+              </ul>
+
+              <button
+                style={styles.windowButton}
+                onClick={() =>
+                  openWindow("Diagnostics", <DiagnosticsPanel />)
+                }
+              >
+                Open Diagnostics Window
+              </button>
+
+              <button
+                style={styles.windowButton}
+                onClick={() =>
+                  openWindow("Operator Console", <OperatorConsole />)
+                }
+              >
+                Open Operator Console Window
+              </button>
+            </div>
+
+            <div style={styles.surface}>
+              <h2 style={styles.surfaceTitle}>{module?.title}</h2>
+              <p style={styles.surfaceDesc}>{module?.description}</p>
+              <div style={styles.surfaceContent}>{module?.content}</div>
+
+              <OperatorConsole />
+              <DiagnosticsPanel />
+            </div>
+          </>
+        )}
+      </WindowManager>
     </div>
   );
 }
@@ -74,13 +102,17 @@ function makeStyles(theme) {
       background: theme.background,
       color: theme.text,
       fontFamily: "Arial, sans-serif",
-      position: "relative"
+      position: "relative",
+      overflow: "hidden"
     },
     nav: {
       width: "220px",
       background: theme.navBackground,
       padding: "20px",
-      borderRight: `1px solid ${theme.border}`
+      borderRight: `1px solid ${theme.border}`,
+      display: "flex",
+      flexDirection: "column",
+      gap: "10px"
     },
     navTitle: {
       margin: "0 0 20px 0",
@@ -104,6 +136,15 @@ function makeStyles(theme) {
       background: theme.navItemActive,
       color: theme.text,
       fontWeight: "bold"
+    },
+    windowButton: {
+      padding: "10px",
+      background: theme.accent,
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      marginTop: "10px"
     },
     surface: {
       flex: 1,
