@@ -1,32 +1,41 @@
 import { EventBus } from "../../runtime/event-bus.js";
 
-let fields = [];
+let sessions = [];
+let activeSession = null;
 
-export function identityPhysics() {
-  console.log("[IdentityPhysics] Engine initialized");
+export function gamesEngineInit() {
+  console.log("[Games] Engine initialized");
 }
 
-export function updateField(name, value) {
-  const field = { name, value };
-  fields.push(field);
+export function startSession(name) {
+  const session = { name, started: Date.now() };
+  sessions.push(session);
+  activeSession = session;
 
-  EventBus.emit("identity:update", field);
+  EventBus.emit("games:sessionStart", session);
 
-  return field;
+  return session;
 }
 
-export function getFieldState() {
-  return fields;
+export function endSession(name) {
+  sessions = sessions.filter(s => s.name !== name);
+
+  EventBus.emit("games:sessionEnd", { name });
 }
 
-export function getFieldCount() {
-  return fields.length;
+export function listSessions() {
+  return sessions;
 }
 
-export function getIdentityPhysicsEngine() {
+export function getActiveSession() {
+  return activeSession;
+}
+
+export function getGamesEngine() {
   return {
-    updateField,
-    getFieldState,
-    getFieldCount
+    startSession,
+    endSession,
+    listSessions,
+    getActiveSession
   };
 }
