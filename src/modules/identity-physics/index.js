@@ -1,34 +1,32 @@
-import { createIdentityPhysicsEngine } from "../../engines/identityPhysicsEngine.js";
+import { EventBus } from "../../runtime/event-bus.js";
 
-let identityEngine = null;
+let fields = [];
 
 export function identityPhysics() {
-  identityEngine = createIdentityPhysicsEngine();
-  console.log("[Identity Physics] Module loaded.");
+  console.log("[IdentityPhysics] Engine initialized");
 }
 
-export function getIdentityEngine() {
-  return identityEngine;
+export function updateField(name, value) {
+  const field = { name, value };
+  fields.push(field);
+
+  EventBus.emit("identity:update", field);
+
+  return field;
 }
 
-// interaction layer
-
-export function idDefine(name, traits) {
-  if (!identityEngine) return null;
-  return identityEngine.defineIdentity(name, traits);
+export function getFieldState() {
+  return fields;
 }
 
-export function idList() {
-  if (!identityEngine) return [];
-  return identityEngine.listIdentities();
+export function getFieldCount() {
+  return fields.length;
 }
 
-export function idGetActive() {
-  if (!identityEngine) return null;
-  return identityEngine.getActiveIdentity();
-}
-
-export function idActivate(name) {
-  if (!identityEngine) return null;
-  return identityEngine.activateIdentity(name);
+export function getIdentityPhysicsEngine() {
+  return {
+    updateField,
+    getFieldState,
+    getFieldCount
+  };
 }
