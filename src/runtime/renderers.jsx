@@ -21,6 +21,13 @@ import {
   xrActivateScene
 } from "../modules/xr/index.js";
 
+import {
+  idDefine,
+  idList,
+  idGetActive,
+  idActivate
+} from "../modules/identity-physics/index.js";
+
 export const ModuleRenderers = {
   games: () => ({
     title: "Games Engine",
@@ -28,11 +35,45 @@ export const ModuleRenderers = {
     content: <div>Games Engine surface.</div>
   }),
 
-  "identity-physics": () => ({
-    title: "Identity Physics",
-    description: "Structures of self and field.",
-    content: <div>Identity Physics surface.</div>
-  }),
+  "identity-physics": () => {
+    const identities = idList();
+    const active = idGetActive();
+
+    return {
+      title: "Identity Physics",
+      description: "Structures of self and field.",
+      content: (
+        <div>
+          <p>Active identity: {active ? active.name : "none"}</p>
+
+          <button
+            onClick={() =>
+              idDefine(
+                `identity-${Date.now()}`,
+                { trait: "dynamic" }
+              )
+            }
+          >
+            Define new identity
+          </button>
+
+          <div style={{ marginTop: "12px" }}>
+            <strong>Identities:</strong>
+            <ul>
+              {identities.map(i => (
+                <li key={i.name}>
+                  {i.name}{" "}
+                  <button onClick={() => idActivate(i.name)}>
+                    activate
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    };
+  },
 
   operators: () => {
     const ops = opList();
