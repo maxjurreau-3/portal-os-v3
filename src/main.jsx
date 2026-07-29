@@ -1,12 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App.jsx";
-import { bootPortalOS } from "./runtime/boot.jsx";
-
-bootPortalOS();
+import { PortalShell } from "./runtime/shell.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
+  <PortalShell />
 );
