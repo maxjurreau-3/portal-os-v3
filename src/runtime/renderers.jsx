@@ -28,12 +28,53 @@ import {
   idActivate
 } from "../modules/identity-physics/index.js";
 
+import {
+  gameStart,
+  gameList,
+  gameGetActive,
+  gameActivate
+} from "../modules/games/index.js";
+
 export const ModuleRenderers = {
-  games: () => ({
-    title: "Games Engine",
-    description: "Interactive systems and simulations.",
-    content: <div>Games Engine surface.</div>
-  }),
+  games: () => {
+    const sessions = gameList();
+    const active = gameGetActive();
+
+    return {
+      title: "Games Engine",
+      description: "Interactive systems and simulations.",
+      content: (
+        <div>
+          <p>Active game session: {active ? active.name : "none"}</p>
+
+          <button
+            onClick={() =>
+              gameStart(
+                `game-session-${Date.now()}`,
+                { mode: "dynamic-game" }
+              )
+            }
+          >
+            Start new game session
+          </button>
+
+          <div style={{ marginTop: "12px" }}>
+            <strong>Game Sessions:</strong>
+            <ul>
+              {sessions.map(s => (
+                <li key={s.name}>
+                  {s.name}{" "}
+                  <button onClick={() => gameActivate(s.name)}>
+                    activate
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    };
+  },
 
   "identity-physics": () => {
     const identities = idList();
