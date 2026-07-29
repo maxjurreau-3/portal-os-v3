@@ -1,4 +1,5 @@
 import { createSimEngine } from "../../engines/simEngine.js";
+import { opRun } from "../operators/index.js";
 
 let simEngine = null;
 
@@ -11,13 +12,10 @@ export function getSimEngine() {
   return simEngine;
 }
 
-// SIM interaction layer
+// interaction layer
 
 export function simCreateSpace(name, config) {
-  if (!simEngine) {
-    console.warn("[SIM] Engine not initialized.");
-    return null;
-  }
+  if (!simEngine) return null;
   return simEngine.createSpace(name, config);
 }
 
@@ -41,3 +39,14 @@ export function simRunInSpace(name, fn) {
   return simEngine.runInSpace(name, fn);
 }
 
+// SIM ↔ Operators Bridge
+
+export function simRunOperatorInActive(operatorName, ...args) {
+  const active = simGetActiveSpace();
+  if (!active) {
+    console.warn("[SIM] No active space.");
+    return null;
+  }
+
+  return opRun(operatorName, active, ...args);
+}
