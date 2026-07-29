@@ -2,8 +2,15 @@ import {
   simCreateSpace,
   simListSpaces,
   simGetActiveSpace,
-  simSwitchSpace
+  simSwitchSpace,
+  simRunOperatorInActive
 } from "../modules/sim/index.js";
+
+import {
+  opRegister,
+  opRun,
+  opList
+} from "../modules/operators/index.js";
 
 export const ModuleRenderers = {
   games: () => ({
@@ -11,16 +18,49 @@ export const ModuleRenderers = {
     description: "Interactive systems and simulations.",
     content: <div>Games Engine surface.</div>
   }),
+
   "identity-physics": () => ({
     title: "Identity Physics",
     description: "Structures of self and field.",
     content: <div>Identity Physics surface.</div>
   }),
-  operators: () => ({
-    title: "Operators",
-    description: "Control plane and system operators.",
-    content: <div>Operators surface.</div>
-  }),
+
+  operators: () => {
+    const ops = opList();
+
+    return {
+      title: "Operators",
+      description: "Control plane and system operators.",
+      content: (
+        <div>
+          <button
+            onClick={() =>
+              opRegister("hello", () => "Hello from operator!")
+            }
+          >
+            Register “hello” operator
+          </button>
+
+          <button
+            onClick={() => console.log(opRun("hello"))}
+            style={{ marginLeft: "10px" }}
+          >
+            Run “hello”
+          </button>
+
+          <div style={{ marginTop: "12px" }}>
+            <strong>Operators:</strong>
+            <ul>
+              {ops.map(o => (
+                <li key={o.name}>{o.name}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    };
+  },
+
   sim: () => {
     const spaces = simListSpaces();
     const active = simGetActiveSpace();
@@ -56,10 +96,23 @@ export const ModuleRenderers = {
               ))}
             </ul>
           </div>
+
+          <div style={{ marginTop: "20px" }}>
+            <button
+              onClick={() =>
+                console.log(
+                  simRunOperatorInActive("timestamp")
+                )
+              }
+            >
+              Run “timestamp” in active space
+            </button>
+          </div>
         </div>
       )
     };
   },
+
   xr: () => ({
     title: "XR Engine",
     description: "Extended reality and multispectral interfaces.",
