@@ -1,14 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { PortalState } from "./state.js";
-import { getSimEngine } from "../modules/sim/index.js";
-import { getOperatorsEngine } from "../modules/operators/index.js";
-import { getXREngine } from "../modules/xr/index.js";
-import { getIdentityPhysicsEngine } from "../modules/identity-physics/index.js";
-import { getGamesEngine } from "../modules/games/index.js";
+import { EventBus } from "./event-bus.js";
 
 export function DiagnosticsPanel() {
   const [metrics, setMetrics] = useState({
-    heartbeat: 0,
+    heartbeat: Date.now(),
     simSpaces: 0,
     operatorsRun: 0,
     xrFrames: 0,
@@ -17,29 +12,71 @@ export function DiagnosticsPanel() {
   });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const sim = getSimEngine();
-      const ops = getOperatorsEngine();
-      const xr = getXREngine();
-      const id = getIdentityPhysicsEngine();
-      const games = getGamesEngine();
-
-      setMetrics({
-        heartbeat: Date.now(),
-        simSpaces: sim ? sim.listSpaces().length : 0,
-        operatorsRun: ops ? ops.getLogs().length : 0,
-        xrFrames: xr ? xr.getFrameCount() : 0,
-        identityFields: id ? id.getFieldCount() : 0,
-        gameSessions: games ? games.listSessions().length : 0
-      });
+    // Update heartbeat every 500ms
+    const heartbeatInterval = setInterval(() => {
+      setMetrics(prev => ({ ...prev, heartbeat: Date.now() }));
     }, 500);
 
-    return () => clearInterval(interval);
+    // SIM events
+    EventBus.on("sim:spaceCreated", () => {
+      setMetrics(prev => ({
+        ...prev,
+        simSpaces: prev.simSpaces + 1
+      }));
+    });
+
+    EventBus.on("sim:spaceRemoved", () => {
+      setMetrics(prev => ({
+        ...prev,
+        simSpaces: Math.max(prev.simSpaces - 1, 0)
+      }));
+    });
+
+    // Operator events
+    EventBus.on("operator:run", () => {
+      setMetrics(prev => ({
+        ...prev,
+        operatorsRun: prev.operatorsRun + 1
+      }));
+    });
+
+    // XR events
+    EventBus.on("xr:frame", () => {
+      setMetrics(prev => ({
+        ...prev,
+        xrFrames: prev.xrFrames + 1
+      }));
+    });
+
+    // Identity Physics events
+    EventBus.on("identity:update", () => {
+      setMetrics(prev => ({
+        ...prev,
+        identityFields: prev.identityFields + 1
+      }));
+    });
+
+    // Games events
+    EventBus.on("games:sessionStart", () => {
+      setMetrics(prev => ({
+        ...prev,
+        gameSessions: prev.gameSessions + 1
+      }));
+    });
+
+    EventBus.on("games:sessionEnd", () => {
+      setMetrics(prev => ({
+        ...prev,
+        gameSessions: Math.max(prev.gameSessions - 1, 0)
+      }));
+    });
+
+    return () => clearInterval(heartbeatInterval);
   }, []);
 
   return (
     <div style={styles.panel}>
-      <h3 style={styles.title}>System Diagnostics</h3>
+      <h3 style={styles.title}>System Diagnostics (Event‑Driven)</h3>
 
       <div style={styles.grid}>
         <Metric label="Heartbeat" value={metrics.heartbeat} />
