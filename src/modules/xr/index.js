@@ -1,34 +1,31 @@
-import { createXREngine } from "../../engines/xrEngine.js";
+import { EventBus } from "../../runtime/event-bus.js";
 
-let xrEngine = null;
+let frameCount = 0;
+let xrState = {};
 
 export function xrEngineInit() {
-  xrEngine = createXREngine();
-  console.log("[XR] Engine module loaded.");
+  console.log("[XR] Engine initialized");
+}
+
+export function xrFrame(data = {}) {
+  frameCount++;
+  xrState = data;
+
+  EventBus.emit("xr:frame", { frameCount, data });
+}
+
+export function getFrameCount() {
+  return frameCount;
+}
+
+export function getState() {
+  return xrState;
 }
 
 export function getXREngine() {
-  return xrEngine;
-}
-
-// XR interaction layer
-
-export function xrCreateScene(name, config) {
-  if (!xrEngine) return null;
-  return xrEngine.createScene(name, config);
-}
-
-export function xrListScenes() {
-  if (!xrEngine) return [];
-  return xrEngine.listScenes();
-}
-
-export function xrGetActiveScene() {
-  if (!xrEngine) return null;
-  return xrEngine.getActiveScene();
-}
-
-export function xrActivateScene(name) {
-  if (!xrEngine) return null;
-  return xrEngine.activateScene(name);
+  return {
+    xrFrame,
+    getFrameCount,
+    getState
+  };
 }
