@@ -4,73 +4,46 @@ import { OperatorConsole } from "./operator-console.jsx";
 import { DiagnosticsPanel } from "./diagnostics.jsx";
 import { Notifications } from "./notifications.jsx";
 import { CommandPalette } from "./command-palette.jsx";
-import { ThemeEngine, DefaultTheme } from "./theme-engine.js";
+import { ThemeEngine } from "./theme-engine.js";
 
 export function PortalShell() {
-  // Initialize unified runtime surface
   const surface = UnifiedSurface();
-
-  // List all modules
   const moduleNames = surface.listModules();
-
-  // Track active module
   const [activeModule, setActiveModule] = useState(moduleNames[0]);
 
-  // Track theme
   const [theme, setTheme] = useState(ThemeEngine.getTheme());
-
-  // Subscribe to theme changes
   useEffect(() => {
-    const unsubscribe = ThemeEngine.onChange(setTheme);
-    return () => unsubscribe();
+    const unsub = ThemeEngine.onChange(setTheme);
+    return () => unsub();
   }, []);
 
-  // Get renderer for active module
   const moduleRenderer = surface.getModule(activeModule);
   const module = moduleRenderer ? moduleRenderer() : null;
 
-  const themedStyles = makeStyles(theme);
+  const styles = makeStyles(theme);
 
   return (
-    <div style={themedStyles.shell}>
-      {/* ⭐ Global OS Notifications */}
+    <div style={styles.shell}>
       <Notifications />
 
-      {/* ⭐ Global Command Palette */}
       <CommandPalette
         onCommand={({ type, name }) => {
           if (type === "switch-module") {
             setActiveModule(name);
           }
-          if (type === "set-theme-dark") {
-            ThemeEngine.setTheme({ mode: "dark", background: "#111" });
-          }
-          if (type === "set-theme-light") {
-            ThemeEngine.setTheme({
-              mode: "light",
-              background: "#f5f5f5",
-              surface: "#ffffff",
-              text: "#111",
-              textMuted: "#555",
-              navBackground: "#e5e5e5",
-              navItem: "#ffffff",
-              navItemActive: "#d4d4d4"
-            });
-          }
         }}
       />
 
-      {/* Left navigation rail */}
-      <div style={themedStyles.nav}>
-        <h3 style={themedStyles.navTitle}>Portal‑OS‑v3</h3>
+      <div style={styles.nav}>
+        <h3 style={styles.navTitle}>Portal‑OS‑v3</h3>
 
-        <ul style={themedStyles.navList}>
+        <ul style={styles.navList}>
           {moduleNames.map(name => (
             <li
               key={name}
               style={{
-                ...themedStyles.navItem,
-                ...(activeModule === name ? themedStyles.navItemActive : {})
+                ...styles.navItem,
+                ...(activeModule === name ? styles.navItemActive : {})
               }}
               onClick={() => setActiveModule(name)}
             >
@@ -80,16 +53,12 @@ export function PortalShell() {
         </ul>
       </div>
 
-      {/* Main module surface */}
-      <div style={themedStyles.surface}>
-        <h2 style={themedStyles.surfaceTitle}>{module?.title}</h2>
-        <p style={themedStyles.surfaceDesc}>{module?.description}</p>
-        <div style={themedStyles.surfaceContent}>{module?.content}</div>
+      <div style={styles.surface}>
+        <h2 style={styles.surfaceTitle}>{module?.title}</h2>
+        <p style={styles.surfaceDesc}>{module?.description}</p>
+        <div style={styles.surfaceContent}>{module?.content}</div>
 
-        {/* ⭐ Operator Console rendered below module content */}
         <OperatorConsole />
-
-        {/* ⭐ Diagnostics Panel rendered below operator console */}
         <DiagnosticsPanel />
       </div>
     </div>
