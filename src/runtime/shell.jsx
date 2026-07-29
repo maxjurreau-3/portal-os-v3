@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { UnifiedSurface } from "./unified.js";
 import { OperatorConsole } from "./operator-console.jsx";
 import { DiagnosticsPanel } from "./diagnostics.jsx";
+import { Notifications } from "./notifications.jsx";
+
 
 export function PortalShell() {
   // Initialize unified runtime surface
