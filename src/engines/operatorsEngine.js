@@ -1,34 +1,41 @@
-import { createOperatorsEngine } from "../../engines/operatorsEngine.js";
+export function createOperatorsEngine() {
+  const state = { operators: [], logs: [] };
 
-let operatorsEngine = null;
+  function registerOperator(name, fn) {
+    const op = { name, fn };
+    state.operators.push(op);
+    console.log("[OperatorsEngine] Operator registered:", name);
+    return op;
+  }
 
-export function operators() {
-  operatorsEngine = createOperatorsEngine();
-  console.log("[Operators] Module loaded.");
-}
+  function runOperator(name, ...args) {
+    const op = state.operators.find(o => o.name === name);
+    if (!op) {
+      console.warn("[OperatorsEngine] Unknown operator:", name);
+      return null;
+    }
+    const result = op.fn(...args);
+    state.logs.push({ name, args, result, at: Date.now() });
+    console.log("[OperatorsEngine] Operator executed:", name, "→", result);
+    return result;
+  }
 
-export function getOperatorsEngine() {
-  return operatorsEngine;
-}
+  function listOperators() {
+    return state.operators;
+  }
 
-// interaction layer
+  function getLogs() {
+    return state.logs;
+  }
 
-export function opRegister(name, fn) {
-  if (!operatorsEngine) return null;
-  return operatorsEngine.registerOperator(name, fn);
-}
+  // default operators
+  registerOperator("ping", () => "pong");
+  registerOperator("timestamp", () => Date.now());
 
-export function opRun(name, ...args) {
-  if (!operatorsEngine) return null;
-  return operatorsEngine.runOperator(name, ...args);
-}
-
-export function opList() {
-  if (!operatorsEngine) return [];
-  return operatorsEngine.listOperators();
-}
-
-export function opLogs() {
-  if (!operatorsEngine) return [];
-  return operatorsEngine.getLogs();
+  return {
+    registerOperator,
+    runOperator,
+    listOperators,
+    getLogs
+  };
 }
