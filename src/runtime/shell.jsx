@@ -6,6 +6,8 @@ import { Notifications } from "./notifications.jsx";
 import { CommandPalette } from "./command-palette.jsx";
 import { ThemeEngine } from "./theme-engine.js";
 import { WindowManager } from "./window-manager.jsx";
+import { Dock } from "./dock.jsx";
+import { AppLauncher } from "./app-launcher.jsx";
 
 export function PortalShell() {
   const surface = UnifiedSurface();
@@ -18,6 +20,8 @@ export function PortalShell() {
     return () => unsub();
   }, []);
 
+  const [launcherOpen, setLauncherOpen] = useState(false);
+
   const moduleRenderer = surface.getModule(activeModule);
   const module = moduleRenderer ? moduleRenderer() : null;
 
@@ -27,22 +31,37 @@ export function PortalShell() {
     <div style={styles.shell}>
       <Notifications />
 
+      {launcherOpen && (
+        <AppLauncher
+          modules={moduleNames}
+          onOpenModule={setActiveModule}
+          onClose={() => setLauncherOpen(false)}
+        />
+      )}
+
       <WindowManager>
-        {({ openWindow }) => (
+        {({ openWindow, windows, bringToFront }) => (
           <>
             <CommandPalette
               onCommand={({ type, name }) => {
                 if (type === "switch-module") {
                   setActiveModule(name);
                 }
-                if (type === "open-window") {
-                  openWindow("New Window", <div>Hello from Portal‑OS‑v3</div>);
+                if (type === "open-launcher") {
+                  setLauncherOpen(true);
                 }
               }}
             />
 
             <div style={styles.nav}>
               <h3 style={styles.navTitle}>Portal‑OS‑v3</h3>
+
+              <button
+                style={styles.launcherButton}
+                onClick={() => setLauncherOpen(true)}
+              >
+                Open App Launcher
+              </button>
 
               <ul style={styles.navList}>
                 {moduleNames.map(name => (
@@ -86,6 +105,14 @@ export function PortalShell() {
               <OperatorConsole />
               <DiagnosticsPanel />
             </div>
+
+            <Dock
+              windows={windows}
+              modules={moduleNames}
+              activeModule={activeModule}
+              onModuleSelect={setActiveModule}
+              onWindowFocus={bringToFront}
+            />
           </>
         )}
       </WindowManager>
@@ -118,6 +145,15 @@ function makeStyles(theme) {
       margin: "0 0 20px 0",
       fontSize: "20px",
       color: theme.text
+    },
+    launcherButton: {
+      padding: "10px",
+      background: theme.accent,
+      color: "#fff",
+      border: "none",
+      borderRadius: "6px",
+      cursor: "pointer",
+      marginBottom: "20px"
     },
     navList: {
       listStyle: "none",
