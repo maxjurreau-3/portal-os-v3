@@ -2,7 +2,7 @@ import { createGamesEngine } from "../../engines/gamesEngine.js";
 
 let gamesEngine = null;
 
-export function games() {
+export function gamesEngineInit() {
   gamesEngine = createGamesEngine();
   console.log("[Games] Engine module loaded.");
 }
