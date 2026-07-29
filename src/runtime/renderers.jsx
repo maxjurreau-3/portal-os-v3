@@ -14,6 +14,13 @@ import {
   opList
 } from "../modules/operators/index.js";
 
+import {
+  xrCreateScene,
+  xrListScenes,
+  xrGetActiveScene,
+  xrActivateScene
+} from "../modules/xr/index.js";
+
 export const ModuleRenderers = {
   games: () => ({
     title: "Games Engine",
@@ -115,9 +122,43 @@ export const ModuleRenderers = {
     };
   },
 
-  xr: () => ({
-    title: "XR Engine",
-    description: "Extended reality and multispectral interfaces.",
-    content: <div>XR Engine surface.</div>
-  })
+  xr: () => {
+    const scenes = xrListScenes();
+    const active = xrGetActiveScene();
+
+    return {
+      title: "XR Engine",
+      description: "Extended reality and multispectral interfaces.",
+      content: (
+        <div>
+          <p>Active XR scene: {active ? active.name : "none"}</p>
+
+          <button
+            onClick={() =>
+              xrCreateScene(
+                `xr-scene-${Date.now()}`,
+                { mode: "dynamic-xr" }
+              )
+            }
+          >
+            Create new XR scene
+          </button>
+
+          <div style={{ marginTop: "12px" }}>
+            <strong>XR Scenes:</strong>
+            <ul>
+              {scenes.map(s => (
+                <li key={s.name}>
+                  {s.name}{" "}
+                  <button onClick={() => xrActivateScene(s.name)}>
+                    activate
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )
+    };
+  }
 };
