@@ -4,7 +4,15 @@ import { opRun } from "../operators/index.js";
 let simEngine = null;
 
 export function simCore() {
+  // Detect Cloudflare Edge (no navigator)
+  const isEdge = typeof navigator === "undefined";
+
   simEngine = createSimEngine();
+
+  if (isEdge) {
+    console.log("[SIM] Edge-safe mode enabled.");
+  }
+
   console.log("[SIM] Core module loaded.");
 }
 
@@ -12,7 +20,7 @@ export function getSimEngine() {
   return simEngine;
 }
 
-// interaction layer
+// SIM interaction layer
 
 export function simCreateSpace(name, config) {
   if (!simEngine) return null;
