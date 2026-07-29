@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { UnifiedSurface } from "./unified.js";
 import { OperatorConsole } from "./operator-console.jsx";
+import { DiagnosticsPanel } from "./diagnostics.jsx";
 
 export function PortalShell() {
   // Initialize unified runtime surface
@@ -46,6 +47,9 @@ export function PortalShell() {
 
         {/* ⭐ Operator Console rendered below module content */}
         <OperatorConsole />
+
+        {/* ⭐ Diagnostics Panel rendered below operator console */}
+        <DiagnosticsPanel />
       </div>
     </div>
   );
