@@ -1,6 +1,6 @@
-import { OperatorConsole } from "./operator-console.jsx";
 import React, { useState } from "react";
 import { UnifiedSurface } from "./unified.js";
+import { OperatorConsole } from "./operator-console.jsx";
 
 export function PortalShell() {
   // Initialize unified runtime surface
@@ -14,7 +14,6 @@ export function PortalShell() {
 
   // Get renderer for active module
   const moduleRenderer = surface.getModule(activeModule);
-
   const module = moduleRenderer ? moduleRenderer() : null;
 
   return (
@@ -44,6 +43,9 @@ export function PortalShell() {
         <h2 style={styles.surfaceTitle}>{module?.title}</h2>
         <p style={styles.surfaceDesc}>{module?.description}</p>
         <div style={styles.surfaceContent}>{module?.content}</div>
+
+        {/* ⭐ Operator Console rendered below module content */}
+        <OperatorConsole />
       </div>
     </div>
   );
@@ -106,6 +108,7 @@ const styles = {
     background: "#1a1a1a",
     padding: "20px",
     borderRadius: "8px",
-    border: "1px solid #333"
+    border: "1px solid #333",
+    marginBottom: "20px"
   }
 };
