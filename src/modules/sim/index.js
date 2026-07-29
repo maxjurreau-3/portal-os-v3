@@ -1,60 +1,41 @@
-import { createSimEngine } from "../../engines/simEngine.js";
-import { opRun } from "../operators/index.js";
+import { EventBus } from "../../runtime/event-bus.js";
 
-let simEngine = null;
+let simSpaces = [];
+let activeSpace = null;
 
 export function simCore() {
-  // Detect Cloudflare Edge (no navigator)
-  const isEdge = typeof navigator === "undefined";
+  console.log("[SIM] Engine initialized");
+}
 
-  simEngine = createSimEngine();
+export function createSimSpace(name, config = {}) {
+  const space = { name, config };
+  simSpaces.push(space);
+  activeSpace = space;
 
-  if (isEdge) {
-    console.log("[SIM] Edge-safe mode enabled.");
-  }
+  EventBus.emit("sim:spaceCreated", space);
 
-  console.log("[SIM] Core module loaded.");
+  return space;
+}
+
+export function removeSimSpace(name) {
+  simSpaces = simSpaces.filter(s => s.name !== name);
+
+  EventBus.emit("sim:spaceRemoved", { name });
+}
+
+export function listSpaces() {
+  return simSpaces;
+}
+
+export function getActiveSpace() {
+  return activeSpace;
 }
 
 export function getSimEngine() {
-  return simEngine;
-}
-
-// SIM interaction layer
-
-export function simCreateSpace(name, config) {
-  if (!simEngine) return null;
-  return simEngine.createSpace(name, config);
-}
-
-export function simListSpaces() {
-  if (!simEngine) return [];
-  return simEngine.listSpaces();
-}
-
-export function simGetActiveSpace() {
-  if (!simEngine) return null;
-  return simEngine.getActiveSpace();
-}
-
-export function simSwitchSpace(name) {
-  if (!simEngine) return null;
-  return simEngine.switchSpace(name);
-}
-
-export function simRunInSpace(name, fn) {
-  if (!simEngine) return null;
-  return simEngine.runInSpace(name, fn);
-}
-
-// SIM ↔ Operators Bridge
-
-export function simRunOperatorInActive(operatorName, ...args) {
-  const active = simGetActiveSpace();
-  if (!active) {
-    console.warn("[SIM] No active space.");
-    return null;
-  }
-
-  return opRun(operatorName, active, ...args);
+  return {
+    listSpaces,
+    getActiveSpace,
+    createSimSpace,
+    removeSimSpace
+  };
 }
