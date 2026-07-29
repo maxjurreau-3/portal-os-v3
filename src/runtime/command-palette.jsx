@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { EventBus } from "./event-bus.js";
 import { UnifiedSurface } from "./unified.js";
+import { ThemeEngine } from "./theme-engine.js";
 import { getOperatorsEngine } from "../modules/operators/index.js";
 import { getSimEngine } from "../modules/sim/index.js";
 import { getXREngine } from "../modules/xr/index.js";
@@ -74,6 +74,60 @@ export function CommandPalette({ onCommand }) {
         const active = games.getActiveSession();
         if (active) games.endSession(active.name);
       }
+    },
+
+    // ⭐ Theme Commands
+    {
+      label: "Theme: Dark Mode",
+      action: () =>
+        ThemeEngine.setTheme({
+          mode: "dark",
+          background: "#111",
+          surface: "#1a1a1a",
+          text: "#eee",
+          textMuted: "#bbb",
+          navBackground: "#1a1a1a",
+          navItem: "#222",
+          navItemActive: "#444",
+          border: "#333"
+        })
+    },
+    {
+      label: "Theme: Light Mode",
+      action: () =>
+        ThemeEngine.setTheme({
+          mode: "light",
+          background: "#f5f5f5",
+          surface: "#ffffff",
+          text: "#111",
+          textMuted: "#555",
+          navBackground: "#e5e5e5",
+          navItem: "#ffffff",
+          navItemActive: "#d4d4d4",
+          border: "#ccc"
+        })
+    },
+
+    // Accent colors
+    {
+      label: "Accent: Blue",
+      action: () => ThemeEngine.setTheme({ accent: "#3b82f6" })
+    },
+    {
+      label: "Accent: Purple",
+      action: () => ThemeEngine.setTheme({ accent: "#8b5cf6" })
+    },
+    {
+      label: "Accent: Red",
+      action: () => ThemeEngine.setTheme({ accent: "#ef4444" })
+    },
+    {
+      label: "Accent: Green",
+      action: () => ThemeEngine.setTheme({ accent: "#22c55e" })
+    },
+    {
+      label: "Accent: Neon",
+      action: () => ThemeEngine.setTheme({ accent: "#00f0ff" })
     }
   ];
 
