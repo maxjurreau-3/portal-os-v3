@@ -4,7 +4,6 @@ import { OperatorConsole } from "./operator-console.jsx";
 import { DiagnosticsPanel } from "./diagnostics.jsx";
 import { Notifications } from "./notifications.jsx";
 
-
 export function PortalShell() {
   // Initialize unified runtime surface
   const surface = UnifiedSurface();
@@ -21,6 +20,9 @@ export function PortalShell() {
 
   return (
     <div style={styles.shell}>
+      {/* ⭐ Global OS Notifications */}
+      <Notifications />
+
       {/* Left navigation rail */}
       <div style={styles.nav}>
         <h3 style={styles.navTitle}>Portal‑OS‑v3</h3>
@@ -64,7 +66,8 @@ const styles = {
     width: "100vw",
     background: "#111",
     color: "#eee",
-    fontFamily: "Arial, sans-serif"
+    fontFamily: "Arial, sans-serif",
+    position: "relative"
   },
   nav: {
     width: "220px",
