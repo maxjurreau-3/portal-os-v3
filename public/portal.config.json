@@ -1,9 +1,0 @@
-{
-  "modules": {
-    "games": {},
-    "identity-physics": {},
-    "operators": {},
-    "sim": {},
-    "xr": {}
-  }
-}
