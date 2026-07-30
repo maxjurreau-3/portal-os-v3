@@ -7,7 +7,6 @@ let activeSpace = null;
 export function simCore() {
   console.log("[SIM] Engine initialized");
 
-  // Create default space on boot
   if (simSpaces.length === 0) {
     createSimSpace("default", { mode: "core" });
   }
@@ -19,17 +18,9 @@ export function createSimSpace(name, config = {}) {
   activeSpace = space;
 
   EventBus.emit("sim:spaceCreated", space);
-
   console.log("[SIM] Space created:", name);
+
   return space;
-}
-
-export function removeSimSpace(name) {
-  simSpaces = simSpaces.filter(s => s.name !== name);
-
-  EventBus.emit("sim:spaceRemoved", { name });
-
-  console.log("[SIM] Space removed:", name);
 }
 
 export function listSpaces() {
@@ -50,8 +41,8 @@ export function activateSpace(name) {
   activeSpace = space;
 
   EventBus.emit("sim:spaceActivated", { name });
-
   console.log("[SIM] Switched to space:", name);
+
   return space;
 }
 
@@ -73,12 +64,17 @@ export function runOperatorInActive(opName) {
   return result;
 }
 
+/* ⭐ ALIASES FOR RENDERERS.JSX — FIXES THE BUILD */
+export const simCreateSpace = createSimSpace;
+export const simListSpaces = listSpaces;
+export const simGetActiveSpace = getActiveSpace;
+export const simSwitchSpace = activateSpace;
+
 export function getSimEngine() {
   return {
     listSpaces,
     getActiveSpace,
     createSimSpace,
-    removeSimSpace,
     activateSpace,
     runOperator: runOperatorInActive
   };
